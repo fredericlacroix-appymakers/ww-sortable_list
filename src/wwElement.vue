@@ -1,108 +1,83 @@
 <template>
   <draggable
-    v-model="items"
+    :list="items"
     :group="content.group || 'default-group'"
-    :itemKey="getItemKey"
+    item-key="id"
     :disabled="isEditing"
     :animation="200"
     :style="{ ...$attrs.style, ...layoutStyle }"
-    @add="onAdd"
-    @remove="onRemove"
-    @update="onUpdate"
-    @change="handleChange"
+    @add="onChange('add', $event)"
+    @update="onChange('update', $event)"
+    @remove="onChange('remove', $event)"
   >
     <template #item="{ element, index }">
       <div>
-        <wwLayoutItemContext is-repeat :data="element" :item="null" :index="index">
-          <wwElement v-bind="content.itemContainer"/>
+        <wwLayoutItemContext
+          is-repeat
+          :data="element"
+          :item="null"
+          :index="index"
+        >
+          <wwElement v-bind="content.itemContainer" />
         </wwLayoutItemContext>
       </div>
     </template>
   </draggable>
 </template>
 
+
 <script>
-import draggable from 'vuedraggable';
+import draggable from "vuedraggable";
 
 export default {
   components: { draggable },
+
   props: {
     content: {
       type: Object,
       required: true,
     },
   },
+
   emits: ["trigger-event"],
+
   setup() {
     return {
-      layoutStyle: wwLib.useLayoutStyle()
+      layoutStyle: wwLib.useLayoutStyle(),
     };
   },
+
   computed: {
-    items: {
-      get() {
-        return wwLib.wwCollection.getCollectionData(this.content.data) || [];
-      },
-      set(value) {
-        // Garde le set pour la réactivité locale du v-model
-        this.updateList(value);
-      }
+    // ✅ Source de vérité UNIQUE
+    items() {
+      return wwLib.wwCollection.getCollectionData(this.content.data) || [];
     },
-    getItemKey() {
-      // Fonction pour générer une clé unique pour chaque item
-      return (item) => {
-        return item.id || item._id || JSON.stringify(item);
-      };
-    },
+
+    // ✅ Désactive le drag en mode édition WeWeb
     isEditing() {
-      // Check si on est en mode édition WeWeb
       return wwLib.getFrontWindow().wwLib?.isEditing || false;
-    }
+    },
   },
+
   methods: {
-    emitListUpdate(eventType = 'change') {
-      // Utilise nextTick pour s'assurer que le DOM est mis à jour
-      this.$nextTick(() => {
-        const currentItems = wwLib.wwCollection.getCollectionData(this.content.data) || [];
-        
-        console.log('🎯 Emitting update:list event', {
-          type: eventType,
-          itemCount: currentItems.length,
-          group: this.content.group
-        });
-        
-        this.$emit("trigger-event", {
-          name: "update:list",
-          event: {
-            value: currentItems,
-            type: eventType,
-            group: this.content.group
-          }
-        });
-      });
-    },
-    onAdd(evt) {
-      this.emitListUpdate('add');
-    },
-    onRemove(evt) {
-      this.emitListUpdate('remove');
-    },
-    onUpdate(evt) {
-      this.emitListUpdate('update');
-    },
-    handleChange(evt) {
-      this.emitListUpdate('change');
-    },
-    updateList(value) {
-      // Cette méthode est appelée par le set() du computed
+    onChange(type, evt) {
+      // 🔥 Toujours créer une NOUVELLE référence
+      const value = [...this.items];
+
       this.$emit("trigger-event", {
         name: "update:list",
-        event: { value }
+        event: {
+          type,               // 'add' | 'update' | 'remove'
+          value,              // état final de la liste
+          oldIndex: evt?.oldIndex ?? null,
+          newIndex: evt?.newIndex ?? null,
+        },
       });
-    }
-  }
+    },
+  },
 };
 </script>
+
 
 <style lang="scss" scoped>
 /* Ajoute des styles si nécessaire pour améliorer le drag & drop */
