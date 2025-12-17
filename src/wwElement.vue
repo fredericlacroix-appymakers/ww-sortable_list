@@ -62,8 +62,9 @@ export default {
   methods: {
   onAdd(evt) {
     const newIndex = evt?.newIndex ?? null;
-    const item = newIndex !== null && this.items[newIndex] 
-      ? JSON.parse(JSON.stringify(this.items[newIndex])) 
+    const itemEl = evt?.item;
+    const item = itemEl?.__draggable_context?.element 
+      ? JSON.parse(JSON.stringify(itemEl.__draggable_context.element))
       : null;
 
     this.$emit("trigger-event", {
@@ -71,7 +72,6 @@ export default {
       event: {
         item,
         newIndex,
-        list: JSON.parse(JSON.stringify(this.items)),
       },
     });
   },
