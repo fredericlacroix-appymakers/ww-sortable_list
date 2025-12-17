@@ -67,11 +67,18 @@ export default {
       ? JSON.parse(JSON.stringify(itemEl.__draggable_context.element))
       : null;
 
+    // Build the new list by inserting item at newIndex
+    const currentList = JSON.parse(JSON.stringify(this.items));
+    if (item && newIndex !== null) {
+      currentList.splice(newIndex, 0, item);
+    }
+
     this.$emit("trigger-event", {
       name: "add:item",
       event: {
         item,
         newIndex,
+        list: currentList,
       },
     });
   },
