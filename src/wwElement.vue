@@ -6,7 +6,8 @@
     :disabled="isEditing"
     :animation="200"
     :style="{ ...$attrs.style, ...layoutStyle }"
-    @change="onChange"
+    @remove="onRemove"
+    @update="onUpdate"
   >
     <template #item="{ element, index }">
       <div>
@@ -22,6 +23,7 @@
     </template>
   </draggable>
 </template>
+
 
 
 
@@ -57,24 +59,24 @@ export default {
   },
 
   methods: {
-    onChange(evt) {
-      // Détection du type de changement
-      const type =
-        evt.added ? "add" :
-        evt.moved ? "update" :
-        evt.removed ? "remove" :
-        "unknown";
+    onRemove(evt) {
+      // 🔥 élément retiré (clé pour ton workflow)
+      const removedItem = evt?.item?._underlying_vm_ || null;
 
-      // ⚠️ PAS de mutation locale
-      // ⚠️ PAS de clone value
+      this.$emit("trigger-event", {
+        name: "remove:item",
+        event: {
+          item: removedItem,
+          oldIndex: evt?.oldIndex ?? null,
+        },
+      });
+    },
 
+    onUpdate(evt) {
+      // réorganisation interne (optionnel)
       this.$emit("trigger-event", {
         name: "update:list",
         event: {
-          type,
-          added: evt.added || null,
-          removed: evt.removed || null,
-          moved: evt.moved || null,
           oldIndex: evt?.oldIndex ?? null,
           newIndex: evt?.newIndex ?? null,
         },
@@ -83,6 +85,7 @@ export default {
   },
 };
 </script>
+
 
 
 

@@ -18,6 +18,14 @@ export default {
       event: { value: ""},
       default: true,
     },
+    {
+    name: "remove:item",
+    label: { en: "On item removed" },
+    event: {
+      item: null,
+      oldIndex: null,
+    },
+  },
   ],
   properties: {
     data: {
