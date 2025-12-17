@@ -6,9 +6,7 @@
     :disabled="isEditing"
     :animation="200"
     :style="{ ...$attrs.style, ...layoutStyle }"
-    @add="onChange('add', $event)"
-    @update="onChange('update', $event)"
-    @remove="onChange('remove', $event)"
+    @change="onChange"
   >
     <template #item="{ element, index }">
       <div>
@@ -48,27 +46,32 @@ export default {
   },
 
   computed: {
-    // ✅ Source de vérité UNIQUE
     items() {
       return wwLib.wwCollection.getCollectionData(this.content.data) || [];
     },
 
-    // ✅ Désactive le drag en mode édition WeWeb
     isEditing() {
       return wwLib.getFrontWindow().wwLib?.isEditing || false;
     },
   },
 
   methods: {
-    onChange(type, evt) {
-      // 🔥 Toujours créer une NOUVELLE référence
+    onChange(evt) {
+      // evt contient add | update | remove
+      const type =
+        evt.added ? "add" :
+        evt.moved ? "update" :
+        evt.removed ? "remove" :
+        "unknown";
+
+      // Toujours créer une nouvelle référence
       const value = [...this.items];
 
       this.$emit("trigger-event", {
         name: "update:list",
         event: {
-          type,               // 'add' | 'update' | 'remove'
-          value,              // état final de la liste
+          type,
+          value,
           oldIndex: evt?.oldIndex ?? null,
           newIndex: evt?.newIndex ?? null,
         },
@@ -77,6 +80,7 @@ export default {
   },
 };
 </script>
+
 
 
 <style lang="scss" scoped>
