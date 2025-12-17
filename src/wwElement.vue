@@ -6,6 +6,7 @@
     :disabled="isEditing"
     :animation="200"
     :style="{ ...$attrs.style, ...layoutStyle }"
+    @add="onAdd"
     @remove="onRemove"
     @update="onUpdate"
   >
@@ -59,8 +60,21 @@ export default {
   },
 
   methods: {
+    onAdd(evt) {
+      // 🔥 élément ajouté
+      const addedItem = evt?.item?._underlying_vm_ || null;
+
+      this.$emit("trigger-event", {
+        name: "add:item",
+        event: {
+          item: addedItem,
+          newIndex: evt?.newIndex ?? null,
+        },
+      });
+    },
+
     onRemove(evt) {
-      // 🔥 élément retiré (clé pour ton workflow)
+      // 🔥 élément retiré
       const removedItem = evt?.item?._underlying_vm_ || null;
 
       this.$emit("trigger-event", {
@@ -73,7 +87,7 @@ export default {
     },
 
     onUpdate(evt) {
-      // réorganisation interne (optionnel)
+      // optionnel : reorder interne
       this.$emit("trigger-event", {
         name: "update:list",
         event: {
@@ -85,6 +99,7 @@ export default {
   },
 };
 </script>
+
 
 
 

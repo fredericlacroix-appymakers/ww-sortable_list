@@ -26,6 +26,14 @@ export default {
       oldIndex: null,
     },
   },
+  {
+    name: "add:item",
+    label: { en: "On item added" },
+    event: {
+      item: null,
+      newIndex: null,
+    },
+  },
   ],
   properties: {
     data: {
