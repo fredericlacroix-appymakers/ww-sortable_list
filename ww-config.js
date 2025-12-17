@@ -23,6 +23,7 @@ export default {
     label: { en: "On item removed" },
     event: {
       item: null,
+      list: null,
       oldIndex: null,
     },
   },
@@ -31,6 +32,7 @@ export default {
     label: { en: "On item added" },
     event: {
       item: null,
+      list: null,
       newIndex: null,
     },
   },
