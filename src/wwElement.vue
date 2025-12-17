@@ -60,43 +60,43 @@ export default {
   },
 
   methods: {
-    onAdd(evt) {
-      // 🔥 élément ajouté
-      const addedItem = evt?.item?._underlying_vm_ || null;
+  onAdd(evt) {
+    const added = evt?.added || null;
 
-      this.$emit("trigger-event", {
-        name: "add:item",
-        event: {
-          item: addedItem,
-          newIndex: evt?.newIndex ?? null,
-        },
-      });
-    },
-
-    onRemove(evt) {
-      // 🔥 élément retiré
-      const removedItem = evt?.item?._underlying_vm_ || null;
-
-      this.$emit("trigger-event", {
-        name: "remove:item",
-        event: {
-          item: removedItem,
-          oldIndex: evt?.oldIndex ?? null,
-        },
-      });
-    },
-
-    onUpdate(evt) {
-      // optionnel : reorder interne
-      this.$emit("trigger-event", {
-        name: "update:list",
-        event: {
-          oldIndex: evt?.oldIndex ?? null,
-          newIndex: evt?.newIndex ?? null,
-        },
-      });
-    },
+    this.$emit("trigger-event", {
+      name: "add:item",
+      event: {
+        item: added ? JSON.parse(JSON.stringify(added.element)) : null,
+        newIndex: added?.newIndex ?? null,
+      },
+    });
   },
+
+  onRemove(evt) {
+    const removed = evt?.removed || null;
+
+    this.$emit("trigger-event", {
+      name: "remove:item",
+      event: {
+        item: removed ? JSON.parse(JSON.stringify(removed.element)) : null,
+        oldIndex: removed?.oldIndex ?? null,
+      },
+    });
+  },
+
+  onUpdate(evt) {
+    const moved = evt?.moved || null;
+
+    this.$emit("trigger-event", {
+      name: "update:list",
+      event: {
+        item: moved ? JSON.parse(JSON.stringify(moved.element)) : null,
+        oldIndex: moved?.oldIndex ?? null,
+        newIndex: moved?.newIndex ?? null,
+      },
+    });
+  },
+},
 };
 </script>
 
