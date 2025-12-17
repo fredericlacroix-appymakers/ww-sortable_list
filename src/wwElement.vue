@@ -24,6 +24,7 @@
 </template>
 
 
+
 <script>
 import draggable from "vuedraggable";
 
@@ -57,21 +58,23 @@ export default {
 
   methods: {
     onChange(evt) {
-      // evt contient add | update | remove
+      // Détection du type de changement
       const type =
         evt.added ? "add" :
         evt.moved ? "update" :
         evt.removed ? "remove" :
         "unknown";
 
-      // Toujours créer une nouvelle référence
-      const value = [...this.items];
+      // ⚠️ PAS de mutation locale
+      // ⚠️ PAS de clone value
 
       this.$emit("trigger-event", {
         name: "update:list",
         event: {
           type,
-          value,
+          added: evt.added || null,
+          removed: evt.removed || null,
+          moved: evt.moved || null,
           oldIndex: evt?.oldIndex ?? null,
           newIndex: evt?.newIndex ?? null,
         },
@@ -80,6 +83,8 @@ export default {
   },
 };
 </script>
+
+
 
 
 
