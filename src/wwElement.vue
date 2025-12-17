@@ -61,38 +61,53 @@ export default {
 
   methods: {
   onAdd(evt) {
-    const added = evt?.added || null;
+    const newIndex = evt?.newIndex ?? null;
+    const item = newIndex !== null && this.items[newIndex] 
+      ? JSON.parse(JSON.stringify(this.items[newIndex])) 
+      : null;
 
     this.$emit("trigger-event", {
       name: "add:item",
       event: {
-        item: added ? JSON.parse(JSON.stringify(added.element)) : null,
-        newIndex: added?.newIndex ?? null,
+        item,
+        newIndex,
+        list: JSON.parse(JSON.stringify(this.items)),
       },
     });
   },
 
   onRemove(evt) {
-    const removed = evt?.removed || null;
+    const oldIndex = evt?.oldIndex ?? null;
+    // Item already removed from this.items, get from event's item data
+    const itemEl = evt?.item;
+    const item = itemEl?.__draggable_context?.element 
+      ? JSON.parse(JSON.stringify(itemEl.__draggable_context.element))
+      : null;
 
     this.$emit("trigger-event", {
       name: "remove:item",
       event: {
-        item: removed ? JSON.parse(JSON.stringify(removed.element)) : null,
-        oldIndex: removed?.oldIndex ?? null,
+        item,
+        oldIndex,
+        list: JSON.parse(JSON.stringify(this.items)),
       },
     });
   },
 
   onUpdate(evt) {
-    const moved = evt?.moved || null;
+    const oldIndex = evt?.oldIndex ?? null;
+    const newIndex = evt?.newIndex ?? null;
+    const item = newIndex !== null && this.items[newIndex]
+      ? JSON.parse(JSON.stringify(this.items[newIndex]))
+      : null;
 
     this.$emit("trigger-event", {
       name: "update:list",
       event: {
-        item: moved ? JSON.parse(JSON.stringify(moved.element)) : null,
-        oldIndex: moved?.oldIndex ?? null,
-        newIndex: moved?.newIndex ?? null,
+        item,
+        oldIndex,
+        newIndex,
+        list: JSON.parse(JSON.stringify(this.items)),
       },
     });
   },
